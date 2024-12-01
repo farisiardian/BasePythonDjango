@@ -1,5 +1,5 @@
-import jwt
-from django.conf import settings
+import jwt # type: ignore
+from django.conf import settings # type: ignore
 from django.contrib.auth.models import User # type: ignore
 from django.contrib.auth.hashers import make_password # type: ignore
 from django.contrib.auth import authenticate # type: ignore
