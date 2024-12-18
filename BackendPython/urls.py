@@ -10,7 +10,6 @@ from controller.views import register_user, login_user
 from controller.views import UserViewSet
 from controller.views import RoleViewSet
 from controller.views import PermissionViewSet
-from controller.views import PermissionHelperViewSet
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -29,7 +28,6 @@ router = DefaultRouter()
 router.register('users', UserViewSet)
 router.register(r'roles', RoleViewSet, basename='role')
 router.register(r'permissions', PermissionViewSet, basename='permission')
-router.register(r'permission-helpers', PermissionHelperViewSet, basename='permission-helper')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

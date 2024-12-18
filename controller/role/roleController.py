@@ -6,7 +6,8 @@ from rest_framework.response import Response  # type: ignore
 from model.models import (
     RoleSerializer,
     ROLE_REQUEST_BODY,
-    ROLE_RESPONSE_BODY
+    ROLE_RESPONSE_BODY_SINGLE,
+    ROLE_RESPONSE_BODY_LIST
 )
 from service.views import (
     create_role_service,
@@ -19,47 +20,42 @@ from service.views import (
 class RoleViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
-    # Create a new role
     @swagger_auto_schema(
         operation_description="Create a new role",
         request_body=ROLE_REQUEST_BODY,
-        responses={201: ROLE_RESPONSE_BODY, 400: "Validation error"}
+        responses={201: ROLE_RESPONSE_BODY_SINGLE, 400: "Validation error"}
     )
     def create(self, request, *args, **kwargs):
         response = create_role_service(request.data)
         return response
 
-    # List all roles
     @swagger_auto_schema(
         operation_description="List all roles",
-        responses={200: ROLE_RESPONSE_BODY}
+        responses={200: ROLE_RESPONSE_BODY_LIST}
     )
     def list(self, request, *args, **kwargs):
         response = list_roles_service()
         return response
 
-    # Retrieve a role by ID
     @swagger_auto_schema(
         operation_description="Retrieve a role by ID",
-        responses={200: ROLE_RESPONSE_BODY, 404: "Role not found"}
+        responses={200: ROLE_RESPONSE_BODY_SINGLE, 404: "Role not found"}
     )
     def retrieve(self, request, *args, **kwargs):
         role_id = kwargs.get('pk')
         response = retrieve_role_service(role_id)
         return response
 
-    # Update a role
     @swagger_auto_schema(
         operation_description="Update an existing role",
         request_body=ROLE_REQUEST_BODY,
-        responses={200: ROLE_RESPONSE_BODY, 400: "Validation error", 404: "Role not found"}
+        responses={200: ROLE_RESPONSE_BODY_SINGLE, 400: "Validation error", 404: "Role not found"}
     )
     def update(self, request, *args, **kwargs):
         role_id = kwargs.get('pk')
         response = update_role_service(role_id, request.data)
         return response
 
-    # Delete a role
     @swagger_auto_schema(
         operation_description="Delete a role",
         responses={204: "Role deleted successfully", 404: "Role not found"}
@@ -68,3 +64,4 @@ class RoleViewSet(viewsets.ViewSet):
         role_id = kwargs.get('pk')
         delete_role_service(role_id)
         return Response(status=204)
+

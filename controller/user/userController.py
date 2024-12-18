@@ -10,13 +10,15 @@ from drf_yasg.utils import swagger_auto_schema # type: ignore
 from service.views import (
     create_user_service,
     me_service,
-    assigned_user_role_service
+    assigned_user_role_service,
+    update_user_service
 )
 
 # Model
 from model.models import (
     USER_REQUEST_BODY, 
-    ASSIGNED_REQUEST_BODY
+    ASSIGNED_REQUEST_BODY,
+    USER_UPDATE_REQUEST_BODY
 )
 from model.models import RoleModel
 from model.models import (
@@ -35,6 +37,30 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_description="Retrieve all users along with their roles.",
+        responses={200: UserSerializer(many=True)}
+    )
+    def list(self, request, *args, **kwargs):
+        # Use 'profile__role' for prefetching the related role
+        users = self.queryset.prefetch_related('profile__role')  # Fetch related profile and role
+        serializer = self.get_serializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @swagger_auto_schema(
+        operation_description="Retrieve a specific user along with their role.",
+        responses={200: UserSerializer()}
+    )
+    def retrieve(self, request, *args, **kwargs):
+        user_id = kwargs.get('pk')
+        try:
+            # Use 'profile__role' for prefetching the related role
+            user = self.queryset.prefetch_related('profile__role').get(id=user_id)
+            serializer = self.get_serializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
     # Create User (register) and assign role (if provided)
     @swagger_auto_schema(
@@ -56,7 +82,18 @@ class UserViewSet(viewsets.ModelViewSet):
     )
     def me(self, request):
         return me_service(request)
-
+    
+    # Create User (register) and assign role (if provided)
+    @swagger_auto_schema(
+        operation_description="Update an existing user and assign a role.",
+        request_body=USER_UPDATE_REQUEST_BODY,  # Request body for updating user details and role
+        responses={200: "User updated successfully", 400: "Validation error"}
+    )
+    def update(self, request, *args, **kwargs):
+        """Update an existing user and their role."""
+        user_id = kwargs.get('pk')  # Get the user's ID from the URL
+        return update_user_service(self, request, user_id)
+    
     # Assign a role to the user (Custom action)
     @action(methods=['post'], detail=False, url_path='assign-role')
     @swagger_auto_schema(

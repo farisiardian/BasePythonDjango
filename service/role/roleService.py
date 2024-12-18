@@ -1,52 +1,46 @@
-from rest_framework.response import Response # type: ignore
-from rest_framework import status # type: ignore
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.generics import get_object_or_404
+from rest_framework.exceptions import ValidationError
+from django.db import IntegrityError
+from model.models import RoleModel, RoleSerializer
 
-from model.models import (
-    RoleModel,
-    RoleSerializer
-)
 
-# Service to create a new role
+# Create a new role
 def create_role_service(data: dict) -> Response:
-    try:
-        role = RoleModel.objects.create(**data)
-        serializer = RoleSerializer(role)
+    serializer = RoleSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    except Exception as e:
-        return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Service to retrieve a role by ID
+
+# Retrieve a role by ID
 def retrieve_role_service(role_id: int) -> Response:
-    try:
-        role = RoleModel.objects.get(id=role_id)
-        serializer = RoleSerializer(role)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except RoleModel.DoesNotExist:
-        return Response({"detail": "Role not found"}, status=status.HTTP_404_NOT_FOUND)
+    role = get_object_or_404(RoleModel, id=role_id)
+    serializer = RoleSerializer(role)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
-# Service to update an existing role
+
+# Update an existing role
 def update_role_service(role_id: int, data: dict) -> Response:
-    try:
-        role = RoleModel.objects.get(id=role_id)
-        for key, value in data.items():
-            setattr(role, key, value)
-        role.save()
-        serializer = RoleSerializer(role)
+    role = get_object_or_404(RoleModel, id=role_id)
+    serializer = RoleSerializer(role, data=data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
-    except RoleModel.DoesNotExist:
-        return Response({"detail": "Role not found"}, status=status.HTTP_404_NOT_FOUND)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Service to delete a role
+
+# Delete a role
 def delete_role_service(role_id: int) -> Response:
-    try:
-        role = RoleModel.objects.get(id=role_id)
-        role.delete()  # Delete role
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    except RoleModel.DoesNotExist:
-        return Response({"detail": "Role not found"}, status=status.HTTP_404_NOT_FOUND)
+    role = get_object_or_404(RoleModel, id=role_id)
+    role.delete()
+    return Response({"detail": "Role deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
-# Service to list all roles
+
+# List all roles
 def list_roles_service() -> Response:
-    roles = RoleModel.objects.all()  # Get all roles
-    role_data = [{"id": role.id, "name": role.name} for role in roles]
-    return Response(role_data, status=status.HTTP_200_OK)
+    roles = RoleModel.objects.all()
+    serializer = RoleSerializer(roles, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)

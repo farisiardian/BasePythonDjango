@@ -1,5 +1,4 @@
-# roleSerializers.py
-from rest_framework import serializers # type: ignore
+from rest_framework import serializers  # type: ignore
 
 # Delay the import to avoid circular import issues
 def get_role_model():
@@ -10,3 +9,4 @@ class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_role_model()  # Get the model dynamically
         fields = ['id', 'name']
+        ref_name = "Role Serializer For Role Module"  # Set a unique ref_name
