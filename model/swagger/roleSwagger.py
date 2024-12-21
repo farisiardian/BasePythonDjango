@@ -29,3 +29,17 @@ ROLE_RESPONSE_BODY_LIST = openapi.Schema(
     type=openapi.TYPE_ARRAY,
     items=ROLE_RESPONSE_BODY_SINGLE,
 )
+
+ROLE_PAGE_PARAMETER = openapi.Parameter(
+    'page',
+    openapi.IN_QUERY,
+    description="Page number for paginated results",
+    type=openapi.TYPE_INTEGER,
+)
+
+ROLE_PAGE_SIZE_PARAMETER = openapi.Parameter(
+    'page_size',
+    openapi.IN_QUERY,
+    description="Number of results per page",
+    type=openapi.TYPE_INTEGER,
+)

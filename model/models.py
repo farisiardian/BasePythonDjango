@@ -8,15 +8,25 @@ from .swagger.authSwagger import (
 from .swagger.userSwagger import (
     USER_REQUEST_BODY, 
     ASSIGNED_REQUEST_BODY, 
-    USER_UPDATE_REQUEST_BODY
+    USER_UPDATE_REQUEST_BODY,
+    USER_PAGE_PARAMETER,
+    USER_PAGE_SIZE_PARAMETER
 )
 from .swagger.roleSwagger import (
     ROLE_NAME_FIELD, 
     ROLE_REQUEST_BODY, 
     ROLE_RESPONSE_BODY_SINGLE,
-    ROLE_RESPONSE_BODY_LIST
+    ROLE_RESPONSE_BODY_LIST,
+    ROLE_PAGE_PARAMETER,
+    ROLE_PAGE_SIZE_PARAMETER
 )
-from .swagger.permissionSwagger import PERMISSION_NAME_FIELD, DESCRIPTION_FIELD, PERMISSION_REQUEST_BODY, PERMISSION_RESPONSE_BODY, ROLE_PARAMETER
+from .swagger.permissionSwagger import (
+    PERMISSION_NAME_FIELD, 
+    DESCRIPTION_FIELD, 
+    PERMISSION_REQUEST_BODY, 
+    PERMISSION_RESPONSE_BODY, 
+    ROLE_PARAMETER
+)
 
 # Models
 from .role.roleModels import RoleModel
@@ -30,3 +40,6 @@ from .user.userSerializers import (
 )
 from .role.roleSerializers import RoleSerializer
 from .permission.permissionSerializers import PermissionSerializer
+
+# Data
+from .permission.permissionData import PERMISSIONS

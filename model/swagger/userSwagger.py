@@ -35,3 +35,17 @@ ASSIGNED_REQUEST_BODY = openapi.Schema(
     },
     required=['user_id', 'role_id'],
 )
+
+USER_PAGE_PARAMETER = openapi.Parameter(
+    'page',
+    openapi.IN_QUERY,
+    description="Page number for paginated results",
+    type=openapi.TYPE_INTEGER,
+)
+
+USER_PAGE_SIZE_PARAMETER = openapi.Parameter(
+    'page_size',
+    openapi.IN_QUERY,
+    description="Number of results per page",
+    type=openapi.TYPE_INTEGER,
+)

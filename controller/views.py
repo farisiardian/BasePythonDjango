@@ -1,3 +1,5 @@
+from .utils import CustomPageNumberPagination
+
 from .auth.auth import register_user, login_user
 from .user.userController import UserViewSet
 from .role.roleController import RoleViewSet

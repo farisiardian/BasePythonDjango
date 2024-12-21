@@ -7,7 +7,9 @@ from model.models import (
     RoleSerializer,
     ROLE_REQUEST_BODY,
     ROLE_RESPONSE_BODY_SINGLE,
-    ROLE_RESPONSE_BODY_LIST
+    ROLE_RESPONSE_BODY_LIST,
+    ROLE_PAGE_PARAMETER,
+    ROLE_PAGE_SIZE_PARAMETER
 )
 from service.views import (
     create_role_service,
@@ -30,11 +32,12 @@ class RoleViewSet(viewsets.ViewSet):
         return response
 
     @swagger_auto_schema(
+        manual_parameters=[ROLE_PAGE_PARAMETER, ROLE_PAGE_SIZE_PARAMETER],
         operation_description="List all roles",
         responses={200: ROLE_RESPONSE_BODY_LIST}
     )
     def list(self, request, *args, **kwargs):
-        response = list_roles_service()
+        response = list_roles_service(request)
         return response
 
     @swagger_auto_schema(

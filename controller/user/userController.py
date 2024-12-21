@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated # type: ignore
 from rest_framework_simplejwt.authentication import JWTAuthentication # type: ignore
 from django.contrib.auth.models import User # type: ignore
 from drf_yasg.utils import swagger_auto_schema # type: ignore
+from controller.views import CustomPageNumberPagination
 
 # Service
 from service.views import (
@@ -18,7 +19,9 @@ from service.views import (
 from model.models import (
     USER_REQUEST_BODY, 
     ASSIGNED_REQUEST_BODY,
-    USER_UPDATE_REQUEST_BODY
+    USER_UPDATE_REQUEST_BODY,
+    USER_PAGE_PARAMETER,
+    USER_PAGE_SIZE_PARAMETER,
 )
 from model.models import RoleModel
 from model.models import (
@@ -37,14 +40,19 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    pagination_class = CustomPageNumberPagination
 
     @swagger_auto_schema(
+        manual_parameters=[USER_PAGE_PARAMETER, USER_PAGE_SIZE_PARAMETER],
         operation_description="Retrieve all users along with their roles.",
         responses={200: UserSerializer(many=True)}
     )
     def list(self, request, *args, **kwargs):
-        # Use 'profile__role' for prefetching the related role
         users = self.queryset.prefetch_related('profile__role')  # Fetch related profile and role
+        page = self.paginate_queryset(users)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
